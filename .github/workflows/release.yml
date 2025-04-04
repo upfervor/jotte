@@ -20,20 +20,16 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install Dependencies
-        run: yarn
+      - name: Enable Corepack
+        run: corepack enable
 
-      - name: Create Release Pull Request or Publish to npm
-        id: changesets
-        uses: changesets/action@v1
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
         with:
-          # This expects you to have a script called release which does a build for your packages and calls changeset publish
-          publish: yarn release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          version: "8.15.6"
 
-      - name: Send a Slack notification if a publish happens
-        if: steps.changesets.outputs.published == 'true'
-        # You can do something when a publish happens.
-        run: my-slack-bot send-notification --message "A new version of ${GITHUB_REPOSITORY} was published!"
+      - name: Install Dependencies
+        run: pnpm install
+
+      - name: Build
+        run: pnpm build
